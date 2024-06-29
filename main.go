@@ -84,19 +84,33 @@ func main() {
 }
 
 func insertClient(db *sql.DB, client Client) (int64, error) {
-	// напишите здесь код для добавления новой записи в таблицу clients
+	//код для добавления новой записи в таблицу clients
+	res, err := db.Exec("INSERT INTO clients (fio, login, birthday, email) VALUES (:fio, :login, :birthday, :email)",
+		sql.Named("fio", client.FIO),
+		sql.Named("login", client.Login),
+		sql.Named("birthday", client.Birthday),
+		sql.Named("email", client.Email))
+	if err != nil {
 
-	return 0, nil // вместо 0 верните идентификатор добавленной записи
+		return 0, nil
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return id, err
 }
 
 func updateClientLogin(db *sql.DB, login string, id int64) error {
-	// напишите здесь код для обновления поля login в таблице clients у записи с заданным id
-	return nil
+	//код для обновления поля login в таблице clients у записи с заданным id
+	_, err := db.Exec("Update clients SET login = :login WHERE id = :id", sql.Named("login", login), sql.Named("id", id))
+	return err
 }
 
 func deleteClient(db *sql.DB, id int64) error {
-	// напишите здесь код для удаления записи из таблицы clients по заданному id
-	return nil
+	//для удаления записи из таблицы clients по заданному id
+	_, err := db.Exec("DELETE FROM clients WHERE id = :id", sql.Named("id", id))
+	return err
 }
 
 func selectClient(db *sql.DB, id int64) (Client, error) {
